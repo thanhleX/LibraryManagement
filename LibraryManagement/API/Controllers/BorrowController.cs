@@ -1,6 +1,6 @@
 ﻿using LibraryManagement.Application.DTOs;
 using LibraryManagement.Application.DTOs.Request;
-using LibraryManagement.Application.Interface.Services;
+using LibraryManagement.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagement.API.Controllers

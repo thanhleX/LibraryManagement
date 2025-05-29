@@ -1,4 +1,4 @@
-﻿namespace LibraryManagement.Domain.Models
+﻿namespace LibraryManagement.Domain.Entities
 {
     public class User
     {

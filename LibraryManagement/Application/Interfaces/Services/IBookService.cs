@@ -1,7 +1,7 @@
 ﻿using LibraryManagement.Application.DTOs;
 using LibraryManagement.Application.DTOs.Request;
 
-namespace LibraryManagement.Application.Interface.Services
+namespace LibraryManagement.Application.Interfaces.Services
 {
     public interface IBookService
     {

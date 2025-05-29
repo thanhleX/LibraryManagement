@@ -1,5 +1,5 @@
-﻿using LibraryManagement.Application.Interface.Repositories;
-using LibraryManagement.Domain.Models;
+﻿using LibraryManagement.Application.Interfaces.Repositories;
+using LibraryManagement.Domain.Entities;
 using LibraryManagement.Infrastructure.AppDataContext;
 using Microsoft.EntityFrameworkCore;
 

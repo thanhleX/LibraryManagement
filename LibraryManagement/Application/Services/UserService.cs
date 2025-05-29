@@ -2,9 +2,9 @@
 using LibraryManagement.API.Middleware;
 using LibraryManagement.Application.DTOs;
 using LibraryManagement.Application.DTOs.Request;
-using LibraryManagement.Application.Interface.Repositories;
-using LibraryManagement.Application.Interface.Services;
-using LibraryManagement.Domain.Models;
+using LibraryManagement.Application.Interfaces.Repositories;
+using LibraryManagement.Application.Interfaces.Services;
+using LibraryManagement.Domain.Entities;
 
 namespace LibraryManagement.Application.Services
 {

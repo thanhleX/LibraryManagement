@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using LibraryManagement.Application.DTOs;
 using LibraryManagement.Application.DTOs.Request;
-using LibraryManagement.Domain.Models;
+using LibraryManagement.Domain.Entities;
 
 namespace LibraryManagement.Application.MappingProfiles
 {

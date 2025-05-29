@@ -1,4 +1,4 @@
-﻿using LibraryManagement.Domain.Models;
+﻿using LibraryManagement.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagement.Infrastructure.AppDataContext
@@ -13,6 +13,7 @@ namespace LibraryManagement.Infrastructure.AppDataContext
         public DbSet<BorrowRecord> BorrowRecords { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<InvalidToken> InvalidTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -48,6 +49,10 @@ namespace LibraryManagement.Infrastructure.AppDataContext
 
             modelBuilder.Entity<User>()
                 .HasIndex(u => new { u.Username, u.Email })
+                .IsUnique(true);
+
+            modelBuilder.Entity<InvalidToken>()
+                .HasIndex(it => it.Token)
                 .IsUnique(true);
         }
     }

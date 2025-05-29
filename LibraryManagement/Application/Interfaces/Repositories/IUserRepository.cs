@@ -1,6 +1,6 @@
-﻿using LibraryManagement.Domain.Models;
+﻿using LibraryManagement.Domain.Entities;
 
-namespace LibraryManagement.Application.Interface.Repositories
+namespace LibraryManagement.Application.Interfaces.Repositories
 {
     public interface IUserRepository
     {

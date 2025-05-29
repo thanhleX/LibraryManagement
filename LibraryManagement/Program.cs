@@ -1,10 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using LibraryManagement.API.Middleware;
 using LibraryManagement.Application.Services;
-using LibraryManagement.Application.Interface.Services;
-using LibraryManagement.Application.Interface.Repositories;
+using LibraryManagement.Application.Interfaces.Repositories;
 using LibraryManagement.Infrastructure.AppDataContext;
 using LibraryManagement.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using LibraryManagement.Infrastructure.Settings;
+using LibraryManagement.Application.Interfaces.Services;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,21 +20,34 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configure Entity Framework Core with SQL Server
 builder.Services.AddDbContext<LibraryManagementDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Configure AutoMapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+// Configure Repositories
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBorrowerRepository, BorrowerRepository>();
 builder.Services.AddScoped<IBorrowRecordRepository, BorrowRecordRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IInvalidTokenRepository, InvalidReposiory>();
 
+// Configure Services
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IBorrowService, BorrowService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+// Configure Jwt Authentication
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
+
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -44,6 +62,7 @@ app.UseMiddleware<GlobalExceptionHandler>();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
