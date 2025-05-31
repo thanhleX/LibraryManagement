@@ -1,9 +1,9 @@
-﻿namespace LibraryManagement.Application.DTOs
+﻿namespace LibraryManagement.Application.DTOs.Response
 {
     public class ApiResponse <T>
     {
         public int Code { get; set; } = 1000;
-        public string Message { get; set; } = "Success";
+        public string Message { get; set; }
         public T? Data { get; set; }
 
         public ApiResponse() { }
@@ -12,12 +12,14 @@
         public ApiResponse(T? data)
         {
             Data = data;
+            Message = "Success";
         }
 
         // fail
         public ApiResponse(int code)
         {
             Code = code;
+            Message = "Fail";
             Data = default;
         }
 

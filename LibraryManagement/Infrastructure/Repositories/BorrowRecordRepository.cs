@@ -29,11 +29,21 @@ namespace LibraryManagement.Infrastructure.Repositories
                     r.ReturnedAt == null);
         }
 
+        public async Task<BorrowRecord?> GetActiveBorrowRecordByUserIdAsync(int bookId, int userId)
+        {
+            return await _context.BorrowRecords
+                .FirstOrDefaultAsync(r =>
+                    r.BookId == bookId &&
+                    r.UserId == userId &&
+                    r.ReturnedAt == null);
+        }
+
         public async Task<IEnumerable<BorrowRecord>> GetAllWithDetailsAsync()
         {
             return await _context.BorrowRecords
                 .Include(r => r.Book)
                 .Include(r => r.Borrower)
+                .Include(r => r.User)
                 .ToListAsync();
         }
 

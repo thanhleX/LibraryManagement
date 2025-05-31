@@ -27,7 +27,7 @@ namespace LibraryManagement.Application.Services
         public async Task<AuthResponse> LoginAsync(AuthRequest request)
         {
             var user = await _userRepository.GetByUsernameAsync(request.Username);
-            bool isAuthenticated = request.Password == user.Password;
+            bool isAuthenticated = BCrypt.Net.BCrypt.Verify(request.Password, user?.Password ?? string.Empty);
             if (user == null || !isAuthenticated)
                 throw new AppException(ErrorCodes.INVALID_CREDENTIALS);
 

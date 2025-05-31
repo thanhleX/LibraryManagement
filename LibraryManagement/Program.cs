@@ -46,6 +46,7 @@ builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 // Configure Jwt Authentication
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
+builder.Services.AddJwtService(builder.Configuration);
 
 builder.Services.AddHttpContextAccessor();
 

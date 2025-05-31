@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
-using LibraryManagement.Application.DTOs;
+using LibraryManagement.Application.DTOs.Response;
 
 namespace LibraryManagement.API.Middleware
 {

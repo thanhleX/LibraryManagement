@@ -28,8 +28,11 @@ namespace LibraryManagement.Application.Services
             if (request.Password != request.RePassword)
                 throw new AppException(ErrorCodes.PASSWORD_MISMATCH);
 
-            var user = _mapper.Map<User>(request);
+            // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password.Trim());
 
+            var user = _mapper.Map<User>(request);
+            user.Password = passwordHash;
             user.Role = isAdminCreating && !string.IsNullOrEmpty(request.Role) ? request.Role : "User";
 
             await _userRepository.CreateAsync(user);
@@ -67,7 +70,9 @@ namespace LibraryManagement.Application.Services
             if (user == null)
                 throw new AppException(ErrorCodes.USER_ID_NOT_FOUND);
 
-            user.Password = request.Password ?? user.Password;
+            if (!string.IsNullOrEmpty(request.Password))
+                user.Password = BCrypt.Net.BCrypt.HashPassword(request.Password.Trim());
+
             user.FullName = request.FullName ?? user.FullName;
             user.Email = request.Email ?? user.Email;
 
