@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagement.Infrastructure.Repositories
 {
-    public class InvalidReposiory : IInvalidTokenRepository
+    public class InvalidTokenRepository : IInvalidTokenRepository
     {
         private readonly LibraryManagementDbContext _context;
 
-        public InvalidReposiory(LibraryManagementDbContext context)
+        public InvalidTokenRepository(LibraryManagementDbContext context)
         {
             _context = context;
         }

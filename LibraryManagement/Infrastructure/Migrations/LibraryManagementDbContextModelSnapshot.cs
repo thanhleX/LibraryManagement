@@ -51,7 +51,7 @@ namespace LibraryManagement.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Books");
+                    b.ToTable("Books", (string)null);
                 });
 
             modelBuilder.Entity("LibraryManagement.Domain.Entities.BorrowRecord", b =>
@@ -85,7 +85,7 @@ namespace LibraryManagement.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BorrowRecords");
+                    b.ToTable("BorrowRecords", (string)null);
                 });
 
             modelBuilder.Entity("LibraryManagement.Domain.Entities.Borrower", b =>
@@ -106,7 +106,7 @@ namespace LibraryManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Borrowers");
+                    b.ToTable("Borrowers", (string)null);
                 });
 
             modelBuilder.Entity("LibraryManagement.Domain.Entities.Category", b =>
@@ -123,7 +123,7 @@ namespace LibraryManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("LibraryManagement.Domain.Entities.InvalidToken", b =>
@@ -146,7 +146,7 @@ namespace LibraryManagement.Migrations
                     b.HasIndex("Token")
                         .IsUnique();
 
-                    b.ToTable("InvalidTokens");
+                    b.ToTable("InvalidTokens", (string)null);
                 });
 
             modelBuilder.Entity("LibraryManagement.Domain.Entities.User", b =>
@@ -185,7 +185,7 @@ namespace LibraryManagement.Migrations
                     b.HasIndex("Username", "Email")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("LibraryManagement.Domain.Entities.Book", b =>

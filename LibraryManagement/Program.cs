@@ -33,7 +33,7 @@ builder.Services.AddScoped<IBorrowerRepository, BorrowerRepository>();
 builder.Services.AddScoped<IBorrowRecordRepository, BorrowRecordRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IInvalidTokenRepository, InvalidReposiory>();
+builder.Services.AddScoped<IInvalidTokenRepository, InvalidTokenRepository>();
 
 // Configure Services
 builder.Services.AddScoped<IBookService, BookService>();
