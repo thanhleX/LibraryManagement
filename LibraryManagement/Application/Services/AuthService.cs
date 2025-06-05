@@ -5,6 +5,7 @@ using LibraryManagement.Application.DTOs.Response;
 using LibraryManagement.Application.Interfaces.Repositories;
 using LibraryManagement.Application.Interfaces.Services;
 using LibraryManagement.Domain.Entities;
+using System.Security.Claims;
 
 namespace LibraryManagement.Application.Services
 {
@@ -12,11 +13,11 @@ namespace LibraryManagement.Application.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IInvalidTokenRepository _iInvalidTokenRepository;
-        private readonly IJwtTokenService _jwtTokenService;
+        private readonly IJwtService _jwtTokenService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public AuthService(IUserRepository userRepository, IInvalidTokenRepository invalidTokenRepository,
-            IJwtTokenService jwtTokenService, IHttpContextAccessor httpContextAccessor)
+            IJwtService jwtTokenService, IHttpContextAccessor httpContextAccessor)
         {
             _userRepository = userRepository;
             _iInvalidTokenRepository = invalidTokenRepository;
@@ -31,69 +32,115 @@ namespace LibraryManagement.Application.Services
             if (user == null || !isAuthenticated)
                 throw new AppException(ErrorCodes.INVALID_CREDENTIALS);
 
-            var token = _jwtTokenService.GenerateToken(user);
+            var tokenInfo = _jwtTokenService.GenerateTokens(user);
             return new AuthResponse
             {
-                AccessToken = token.AccessToken,
-                RefreshToken = token.RefreshToken,
-                ExpirationTime = token.AccessTokenExpiration
+                AccessToken = tokenInfo.AccessToken,
+                RefreshToken = tokenInfo.RefreshToken,
+                IsAuthenticated = true,
+                ExpiresAt = tokenInfo.ExpiresAt
             };
         }
 
         public async Task LogoutAsync(LogoutRequest request)
         {
-            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
-                            .FirstOrDefault()?.Split(" ").Last();
-
-            if (string.IsNullOrEmpty(token))
-                throw new AppException(ErrorCodes.INVALID_TOKEN);
-
-            var handler = new JwtSecurityTokenHandler();
-            JwtSecurityToken jwtToken;
-
-            try
+            // Validate and blacklist the access token
+            var accessTokenPrincipal = await _jwtTokenService.ValidateToken(request.AccessToken);
+            if (accessTokenPrincipal != null)
             {
-                jwtToken = handler.ReadJwtToken(token);
-            }
-            catch
-            {
-                throw new AppException(ErrorCodes.INVALID_TOKEN);
+                var accessTokenExpiry = accessTokenPrincipal.FindFirst(JwtRegisteredClaimNames.Exp)?.Value;
+                if (!string.IsNullOrEmpty(accessTokenExpiry))
+                {
+                    await _iInvalidTokenRepository.AddInvalidTokenAsync(new InvalidToken
+                    {
+                        Token = request.AccessToken,
+                        ExpiratedAt = DateTimeOffset.FromUnixTimeSeconds(long.Parse(accessTokenExpiry)).UtcDateTime
+                    });
+                }
             }
 
-            var expiredAt = jwtToken.ValidTo;
-
-            await _iInvalidTokenRepository.AddInvalidTokenAsync(new InvalidToken
+            // Validate and blacklist the refresh token
+            var refreshTokenPrincipal = await _jwtTokenService.ValidateToken(request.RefreshToken);
+            if (refreshTokenPrincipal != null)
             {
-                Token = token,
-                ExpiratedAt = expiredAt,
-            });
+                var refreshTokenExpiry = refreshTokenPrincipal.FindFirst(JwtRegisteredClaimNames.Exp)?.Value;
+                if (!string.IsNullOrEmpty(refreshTokenExpiry))
+                {
+                    await _iInvalidTokenRepository.AddInvalidTokenAsync(new InvalidToken
+                    {
+                        Token = request.RefreshToken,
+                        ExpiratedAt = DateTimeOffset.FromUnixTimeSeconds(long.Parse(refreshTokenExpiry)).UtcDateTime
+                    });
+                }
+            }
+
+            // Clear any existing authentication cookies
+            if (_httpContextAccessor.HttpContext != null)
+            {
+                _httpContextAccessor.HttpContext.Response.Cookies.Delete("access_token");
+                _httpContextAccessor.HttpContext.Response.Cookies.Delete("refresh_token");
+            }
         }
 
         public async Task<AuthResponse> RefreshTokenAsync(RefreshTokenRequest request)
         {
-            if (await _iInvalidTokenRepository.IsTokenInvalidAsync(request.RefreshToken))
-                throw new AppException(ErrorCodes.INVALID_TOKEN);
-
-            var principal = _jwtTokenService.GetPrincipalFromExpiredToken(request.RefreshToken);
+            var principal = await _jwtTokenService.ValidateToken(request.RefreshToken);
             if (principal == null)
                 throw new AppException(ErrorCodes.INVALID_TOKEN);
 
-            var username = principal.Identity?.Name;
-            if (string.IsNullOrEmpty(username))
-                throw new AppException(ErrorCodes.INVALID_CREDENTIALS);
+            // Verify this is a refresh token
+            var tokenType = principal.FindFirst("token_type")?.Value;
+            if (tokenType != "refresh_token")
+                throw new AppException(ErrorCodes.INVALID_TOKEN);
 
-            var user = await _userRepository.GetByUsernameAsync(username);
+            // Check if token is in invalid tokens list
+            if (await _iInvalidTokenRepository.IsTokenInvalidAsync(request.RefreshToken))
+                throw new AppException(ErrorCodes.INVALID_TOKEN);
+
+            // Get user ID from token
+            var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                throw new AppException(ErrorCodes.INVALID_TOKEN);
+
+            // Get user from database
+            var user = await _userRepository.GetByIdAsync(int.Parse(userId));
             if (user == null)
                 throw new AppException(ErrorCodes.USER_NOT_FOUND);
 
-            var token = _jwtTokenService.GenerateToken(user);
+            // Invalidate the old refresh token
+            var expiryTime = principal.FindFirst(JwtRegisteredClaimNames.Exp)?.Value;
+            if (!string.IsNullOrEmpty(expiryTime))
+            {
+                await _iInvalidTokenRepository.AddInvalidTokenAsync(new InvalidToken
+                {
+                    Token = request.RefreshToken,
+                    ExpiratedAt = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expiryTime)).UtcDateTime
+                });
+            }
 
+            // Generate new tokens
+            var tokenInfo = _jwtTokenService.GenerateTokens(user);
             return new AuthResponse
             {
-                AccessToken = token.AccessToken,
-                RefreshToken = token.RefreshToken,
-                ExpirationTime = token.AccessTokenExpiration
+                AccessToken = tokenInfo.AccessToken,
+                RefreshToken = tokenInfo.RefreshToken,
+                IsAuthenticated = true,
+                ExpiresAt = tokenInfo.ExpiresAt
             };
+        }
+
+        public async Task<IntrospectResponse> IntrospectAsync(IntrospectRequest request)
+        {
+            var principal = await _jwtTokenService.ValidateToken(request.Token);
+            if (principal == null)
+                return new IntrospectResponse { IsValid = false };
+
+            var tokenId = principal.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+            if (string.IsNullOrEmpty(tokenId))
+                return new IntrospectResponse { IsValid = false };
+
+            var isInvalid = await _iInvalidTokenRepository.IsTokenInvalidAsync(request.Token);
+            return new IntrospectResponse { IsValid = !isInvalid };
         }
     }
 }

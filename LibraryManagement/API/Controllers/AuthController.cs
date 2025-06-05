@@ -24,18 +24,25 @@ namespace LibraryManagement.API.Controllers
         }
 
         // POST: api/auth/logout
-        //[HttpPost("logout")]
-        //public async Task<ApiResponse<object>> Logout([FromBody] LogoutRequest request)
-        //{
-        //    await _authService.LogoutAsync(request);
-        //    return new ApiResponse<object>();
-        //}
+        [HttpPost("logout")]
+        public async Task<ApiResponse<object>> Logout([FromBody] LogoutRequest request)
+        {
+            await _authService.LogoutAsync(request);
+            return ApiResponse<object>.Success(null);
+        }
+
+        // POST: api/auth/introspect
+        [HttpPost("introspect")]
+        public async Task<ApiResponse<IntrospectResponse>> Introspect([FromBody] IntrospectRequest request)
+        {
+            return ApiResponse<IntrospectResponse>.Success(await _authService.IntrospectAsync(request));
+        }
 
         // POST: api/auth/refresh-token
-        //[HttpPost("refresh-token")]
-        //public async Task<ApiResponse<AuthResponse>> RefreshToken([FromBody] RefreshTokenRequest request)
-        //{
-        //    return ApiResponse<AuthResponse>.Success(await _authService.RefreshTokenAsync(request));
-        //}
+        [HttpPost("refresh-token")]
+        public async Task<ApiResponse<AuthResponse>> RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            return ApiResponse<AuthResponse>.Success(await _authService.RefreshTokenAsync(request));
+        }
     }
 }

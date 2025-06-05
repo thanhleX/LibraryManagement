@@ -7,6 +7,7 @@ namespace LibraryManagement.Application.Interfaces.Services
     {
         Task<AuthResponse> LoginAsync(AuthRequest request);
         Task LogoutAsync(LogoutRequest request);
+        Task<IntrospectResponse> IntrospectAsync(IntrospectRequest request);
         Task<AuthResponse> RefreshTokenAsync(RefreshTokenRequest request);
     }
 }

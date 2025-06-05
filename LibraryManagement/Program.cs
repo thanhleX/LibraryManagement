@@ -41,12 +41,10 @@ builder.Services.AddScoped<IBorrowService, BorrowService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 
 // Configure Jwt Authentication
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
-builder.Services.AddJwtService(builder.Configuration);
+builder.Services.AddJwtService(builder.Configuration); // read configuration from appsettings.json
 
 builder.Services.AddHttpContextAccessor();
 

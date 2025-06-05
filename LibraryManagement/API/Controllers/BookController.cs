@@ -2,12 +2,14 @@
 using LibraryManagement.Application.DTOs.Request;
 using LibraryManagement.Application.DTOs.Response;
 using LibraryManagement.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagement.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;

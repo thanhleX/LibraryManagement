@@ -9,6 +9,7 @@ namespace LibraryManagement.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class BorrowController : ControllerBase
     {
         private readonly IBorrowService _borrowService;
@@ -28,7 +29,6 @@ namespace LibraryManagement.API.Controllers
 
         // GET: api/borrow
         [HttpGet]
-        [Authorize]
         public async Task<ApiResponse<IEnumerable<BorrowRecordDto>>> GetAllBorrowRecords()
         {
             return ApiResponse<IEnumerable<BorrowRecordDto>>
