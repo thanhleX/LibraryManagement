@@ -9,7 +9,6 @@ namespace LibraryManagement.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class BorrowController : ControllerBase
     {
         private readonly IBorrowService _borrowService;
@@ -21,6 +20,7 @@ namespace LibraryManagement.API.Controllers
 
         // POST: api/borrow
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ApiResponse<BorrowRecordDto>> BorrowBook([FromBody] BorrowBookRequest request)
         {
             return ApiResponse<BorrowRecordDto>
@@ -29,6 +29,7 @@ namespace LibraryManagement.API.Controllers
 
         // GET: api/borrow
         [HttpGet]
+        [Authorize]
         public async Task<ApiResponse<IEnumerable<BorrowRecordDto>>> GetAllBorrowRecords()
         {
             return ApiResponse<IEnumerable<BorrowRecordDto>>
@@ -37,6 +38,7 @@ namespace LibraryManagement.API.Controllers
 
         // POST: api/borrow/return
         [HttpPost("return")]
+        [AllowAnonymous]
         public async Task<ApiResponse<BorrowRecordDto>> ReturnBook([FromBody] ReturnBookRequest request)
         {
             return ApiResponse<BorrowRecordDto>

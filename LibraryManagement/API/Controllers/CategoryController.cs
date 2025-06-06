@@ -9,7 +9,6 @@ namespace LibraryManagement.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
@@ -21,6 +20,7 @@ namespace LibraryManagement.API.Controllers
 
         // GET: api/category
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ApiResponse<IEnumerable<CategoryDto>>> GetAllAsync()
         {
             var categories = await _categoryService.GetAllCategoriesAsync();
@@ -29,6 +29,7 @@ namespace LibraryManagement.API.Controllers
 
         // POST: api/category
         [HttpPost]
+        [Authorize]
         public async Task<ApiResponse<CategoryDto>> CreatAsync([FromBody] CreateCategoryRequest request)
         {
             return ApiResponse<CategoryDto>
