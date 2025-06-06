@@ -38,7 +38,7 @@ namespace LibraryManagement.API.Middleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = error.httpStatusCode;
 
-            var response = ApiResponse<object>.Fail(error.code);
+            var response = ApiResponse<object>.Fail(error.code, error.message);
 
             var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
             {
