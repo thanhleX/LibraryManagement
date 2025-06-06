@@ -47,6 +47,16 @@ namespace LibraryManagement.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<BorrowRecord>> GetAllActiveBorrowRecordsAsync()
+        {
+            return await _context.BorrowRecords
+                .Include(r => r.Book)
+                .Include(r => r.Borrower)
+                .Include(r => r.User)
+                .Where(r => r.ReturnedAt == null)
+                .ToListAsync();
+        }
+
         public Task UpdateAsync(BorrowRecord record)
         {
             _context.BorrowRecords.Update(record);
