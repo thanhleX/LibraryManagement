@@ -14,6 +14,7 @@ namespace LibraryManagement.Infrastructure.AppDataContext
         public DbSet<Category> Categories { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<InvalidToken> InvalidTokens { get; set; }
+        public DbSet<BookImage> BookImages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

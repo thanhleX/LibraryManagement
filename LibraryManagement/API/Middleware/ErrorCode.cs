@@ -23,5 +23,7 @@
         public static ErrorCode INVALID_CREDENTIALS => new(1011, "Invalid credentials", StatusCodes.Status401Unauthorized);
         public static ErrorCode INVALID_TOKEN => new(1012, "Invalid token", StatusCodes.Status401Unauthorized);
         public static ErrorCode USER_NOT_FOUND => new(1013, "User not found", StatusCodes.Status404NotFound);
+        public static ErrorCode BOOK_IMAGE_NOT_FOUND => new(1014, "Book image not found", StatusCodes.Status404NotFound);
+        public static ErrorCode INVALID_IMAGE_FORMAT => new(1015, "Invalid image format. Allowed formats: JPG, JPEG, PNG, GIF", StatusCodes.Status400BadRequest);
     }
 }

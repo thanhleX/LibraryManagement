@@ -34,6 +34,7 @@ builder.Services.AddScoped<IBorrowRecordRepository, BorrowRecordRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IInvalidTokenRepository, InvalidTokenRepository>();
+builder.Services.AddScoped<IBookImageRepository, BookImageRepository>();
 
 // Configure Services
 builder.Services.AddScoped<IBookService, BookService>();
@@ -42,6 +43,9 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+builder.Services.AddHostedService<BookReturnReminderService>();
 
 // Configure Jwt Authentication
 builder.Services.AddJwtService(builder.Configuration); // read configuration from appsettings.json
