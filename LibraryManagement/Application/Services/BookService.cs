@@ -5,6 +5,7 @@ using LibraryManagement.Application.DTOs.Request;
 using LibraryManagement.Application.Interfaces.Repositories;
 using LibraryManagement.Application.Interfaces.Services;
 using LibraryManagement.Domain.Entities;
+using System.Linq;
 
 namespace LibraryManagement.Application.Services
 {
@@ -21,9 +22,24 @@ namespace LibraryManagement.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<BookDto>> GetAllAsync(int? categoryId)
+        public async Task<IEnumerable<BookDto>> GetAllAsync()
+        {
+            var books = await _bookRepository.GetAllAsync(null);
+            return _mapper.Map<IEnumerable<BookDto>>(books);
+        }
+
+        public async Task<IEnumerable<BookDto>> SearchAsync(int? categoryId, string? searchTerm)
         {
             var books = await _bookRepository.GetAllAsync(categoryId);
+            
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+                books = books.Where(b => 
+                    b.Title.ToLower().Contains(searchTerm) || 
+                    b.Author.ToLower().Contains(searchTerm));
+            }
+
             return _mapper.Map<IEnumerable<BookDto>>(books);
         }
 
@@ -34,6 +50,23 @@ namespace LibraryManagement.Application.Services
                 throw new AppException(ErrorCodes.BOOK_ID_NOT_FOUND);
 
             return _mapper.Map<BookDto>(book);
+        }
+
+        public async Task<EbookInfoDto?> GetEbookInfoAsync(int id)
+        {
+            var book = await _bookRepository.GetByIdAsync(id);
+            if (book == null || string.IsNullOrEmpty(book.EbookUrl))
+                return null;
+
+            return new EbookInfoDto
+            {
+                BookId = book.Id,
+                Title = book.Title,
+                Author = book.Author,
+                DownloadUrl = book.EbookUrl,
+                Format = book.EbookFormat ?? "Unknown",
+                Size = book.EbookSize ?? 0
+            };
         }
 
         public async Task<BookDto> CreateAsync(CreateBookRequest request)
