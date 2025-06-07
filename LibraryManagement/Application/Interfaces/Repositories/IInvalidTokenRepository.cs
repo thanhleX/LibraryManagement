@@ -7,5 +7,6 @@ namespace LibraryManagement.Application.Interfaces.Repositories
         Task AddInvalidTokenAsync(InvalidToken token);
         Task<bool> IsTokenInvalidAsync(string token);
         Task RemoveInvalidTokenAsync(string token);
+        Task RemoveExpireTokenAsync();
     }
 }

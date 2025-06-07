@@ -25,6 +25,18 @@ namespace LibraryManagement.Infrastructure.Repositories
             return await _context.InvalidTokens.AnyAsync(t => t.Token == token);
         }
 
+        public async Task RemoveExpireTokenAsync()
+        {
+            var expiredTokens = await _context.InvalidTokens
+                .Where(t => t.ExpiratedAt < DateTime.UtcNow)
+                .ToListAsync();
+
+            if (expiredTokens.Any())
+                _context.InvalidTokens.RemoveRange(expiredTokens);
+            
+            await _context.SaveChangesAsync();
+        }
+
         public async Task RemoveInvalidTokenAsync(string token)
         {
             var expiredToken = _context.InvalidTokens.Where(t => t.ExpiratedAt < DateTime.UtcNow);
