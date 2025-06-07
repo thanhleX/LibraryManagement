@@ -73,13 +73,6 @@ namespace LibraryManagement.Application.Services
                     });
                 }
             }
-
-            // Clear any existing authentication cookies
-            if (_httpContextAccessor.HttpContext != null)
-            {
-                _httpContextAccessor.HttpContext.Response.Cookies.Delete("access_token");
-                _httpContextAccessor.HttpContext.Response.Cookies.Delete("refresh_token");
-            }
         }
 
         public async Task<AuthResponse> RefreshTokenAsync(RefreshTokenRequest request)
