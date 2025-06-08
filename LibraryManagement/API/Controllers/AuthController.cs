@@ -16,6 +16,13 @@ namespace LibraryManagement.API.Controllers
             _authService = authService;
         }
 
+        // POST: api/auth/register
+        [HttpPost("register")]
+        public async Task<ApiResponse<AuthResponse>> Register([FromBody] CreateUserRequest request)
+        {
+            return ApiResponse<AuthResponse>.Success(await _authService.RegisterAsync(request));
+        }
+
         // POST: api/auth/login
         [HttpPost("login")]
         public async Task<ApiResponse<AuthResponse>> Login([FromBody] AuthRequest request)

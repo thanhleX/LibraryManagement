@@ -25,6 +25,40 @@ namespace LibraryManagement.Application.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
+        public async Task<AuthResponse> RegisterAsync(CreateUserRequest request)
+        {
+            // Check if username already exists
+            var existingUser = await _userRepository.GetByUsernameAsync(request.Username);
+            if (existingUser != null)
+                throw new AppException(ErrorCodes.USERNAME_ALREADY_EXISTS);
+
+            // Validate password match
+            if (request.Password != request.RePassword)
+                throw new AppException(ErrorCodes.PASSWORD_MISMATCH);
+
+            // Create new user
+            var user = new User
+            {
+                Username = request.Username,
+                Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                FullName = request.FullName,
+                Email = request.Email,
+                Role = "User" //Role default is User
+            };
+
+            await _userRepository.CreateAsync(user);
+
+            // Generate tokens for the new user
+            var tokenInfo = _jwtTokenService.GenerateTokens(user);
+            return new AuthResponse
+            {
+                AccessToken = tokenInfo.AccessToken,
+                RefreshToken = tokenInfo.RefreshToken,
+                IsAuthenticated = true,
+                ExpiresAt = tokenInfo.ExpiresAt
+            };
+        }
+
         public async Task<AuthResponse> LoginAsync(AuthRequest request)
         {
             var user = await _userRepository.GetByUsernameAsync(request.Username);

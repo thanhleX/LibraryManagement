@@ -26,5 +26,6 @@
         public static ErrorCode BOOK_IMAGE_NOT_FOUND => new(1014, "Book image not found", StatusCodes.Status404NotFound);
         public static ErrorCode INVALID_IMAGE_FORMAT => new(1015, "Invalid image format. Allowed formats: JPG, JPEG, PNG, GIF", StatusCodes.Status400BadRequest);
         public static ErrorCode TOKEN_REVOKED => new(1016, "Token has been revoked", StatusCodes.Status401Unauthorized);
+        public static ErrorCode UNAUTHORIZED => new(1017, "You are not authorized to perform this action", StatusCodes.Status403Forbidden);
     }
 }

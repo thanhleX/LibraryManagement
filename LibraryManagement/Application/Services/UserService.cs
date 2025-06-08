@@ -19,7 +19,7 @@ namespace LibraryManagement.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<UserDto> CreateUserAsync(CreateUserRequest request, bool isAdminCreating = false)
+        public async Task<UserDto> CreateUserAsync(CreateUserRequest request)
         {
             var existingUser = await _userRepository.GetByUsernameAsync(request.Username.Trim().ToLower());
             if (existingUser != null)
@@ -33,7 +33,7 @@ namespace LibraryManagement.Application.Services
 
             var user = _mapper.Map<User>(request);
             user.Password = passwordHash;
-            user.Role = isAdminCreating && !string.IsNullOrEmpty(request.Role) ? request.Role : "User";
+            user.Role = !string.IsNullOrEmpty(request.Role) ? request.Role : "User";
 
             await _userRepository.CreateAsync(user);
             return _mapper.Map<UserDto>(user);
@@ -58,7 +58,7 @@ namespace LibraryManagement.Application.Services
         public async Task<UserDto> GetUserByIdAsync(int userId)
         {
             var user = await _userRepository.GetByIdAsync(userId);
-            if ( user == null)
+            if (user == null)
                 throw new AppException(ErrorCodes.USER_ID_NOT_FOUND);
 
             return _mapper.Map<UserDto>(user);
