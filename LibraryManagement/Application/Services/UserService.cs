@@ -45,6 +45,10 @@ namespace LibraryManagement.Application.Services
             if (user == null)
                 throw new AppException(ErrorCodes.USER_ID_NOT_FOUND);
 
+            // Check if user has any active borrow records
+            if (user.BorrowRecords.Any(br => !br.IsReturned))
+                throw new AppException(ErrorCodes.USER_HAS_ACTIVE_BORROWS);
+
             user.IsActive = false;
             await _userRepository.UpdateAsync(user);
         }
@@ -76,7 +80,9 @@ namespace LibraryManagement.Application.Services
             user.FullName = request.FullName ?? user.FullName;
             user.Email = request.Email ?? user.Email;
 
-            user.Role = isAdmin && !string.IsNullOrEmpty(request.Role) ? request.Role : user.Role;
+            // Only admin can update role
+            if (isAdmin && !string.IsNullOrEmpty(request.Role))
+                user.Role = request.Role;
             
             await _userRepository.UpdateAsync(user);
             return _mapper.Map<UserDto>(user);

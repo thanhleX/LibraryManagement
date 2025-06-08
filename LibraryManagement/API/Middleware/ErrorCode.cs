@@ -27,5 +27,6 @@
         public static ErrorCode INVALID_IMAGE_FORMAT => new(1015, "Invalid image format. Allowed formats: JPG, JPEG, PNG, GIF", StatusCodes.Status400BadRequest);
         public static ErrorCode TOKEN_REVOKED => new(1016, "Token has been revoked", StatusCodes.Status401Unauthorized);
         public static ErrorCode UNAUTHORIZED => new(1017, "You are not authorized to perform this action", StatusCodes.Status403Forbidden);
+        public static ErrorCode USER_HAS_ACTIVE_BORROWS => new(1018, "Cannot delete account while having active borrows", StatusCodes.Status400BadRequest);
     }
 }
